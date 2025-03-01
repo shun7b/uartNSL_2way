@@ -1,0 +1,36 @@
+#include "uart.inc"
+#include "uart_top.inc"
+module uart_top{
+     uart send[2];
+     reg clk_divide[16]=16'b0;
+     reg clk_10m=1'b0;
+     reg start_count[16]=16'b0;
+     txd={send[0].TxD_o,send[1].TxD_o};
+     send[0].Freq_Divide_Param_i=0x0020;
+     send[0].Tx_BitLength_i=0b11;
+     send[0].Tx_ParityEN_i =0b0;
+     send[0].Tx_Enable_i=TRUE;
+     send[0].Tx_Data_i=0x38;
+     send[1].Freq_Divide_Param_i=0x0020;
+     send[1].Tx_BitLength_i=0b11;
+     send[1].Tx_ParityEN_i =0b0;
+     send[1].Tx_Enable_i=TRUE;
+     send[1].Tx_Data_i=0x39;
+     if(clk_divide==4){
+          clk_10m:=~clk_10m;
+          clk_divide:=16'b0;
+     }else{
+          clk_divide++;
+     }
+
+     if(start_count>0d5&&start_count<0d18){
+          send[0].Tx_Start_i();
+          send[1].Tx_Start_i();
+     }
+          if(start_count==0d32){
+               start_count:=0d31;
+          }else{
+               start_count++;
+          }
+     
+}
